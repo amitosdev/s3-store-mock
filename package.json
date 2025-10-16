@@ -1,5 +1,5 @@
 {
-  "name": "s3-store-mock",
+  "name": "@amitosdev/s3-store-mock",
   "version": "1.0.0",
   "description": "Mock implementation of @kessler/s3-store using local file system",
   "author": "Amit Tal",

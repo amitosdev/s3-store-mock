@@ -1,4 +1,4 @@
-# s3-store-mock
+# @amitosdev/s3-store-mock
 
 A mock implementation of [@kessler/s3-store](https://github.com/kessler/s3-store) that uses the local file system instead of AWS S3.
 
@@ -9,7 +9,7 @@ This package provides a drop-in replacement for `@kessler/s3-store` that stores 
 ## Installation
 
 ```bash
-npm install s3-store-mock @kessler/s3-store
+npm install @amitosdev/s3-store-mock @kessler/s3-store
 ```
 
 Note: `@kessler/s3-store` is required as a peer dependency for the JSON wrapper functionality.
@@ -17,7 +17,7 @@ Note: `@kessler/s3-store` is required as a peer dependency for the JSON wrapper 
 ## Usage
 
 ```javascript
-import createS3Store from 's3-store-mock'
+import createS3Store from '@amitosdev/s3-store-mock'
 import { createJsonWrapper } from '@kessler/s3-store'
 
 // Create a store (stores files in .s3StoreMock/my-bucket/ by default)
