@@ -1,6 +1,6 @@
 {
   "name": "s3-store-mock",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Mock implementation of @kessler/s3-store using local file system",
   "author": "Amit Tal",
   "license": "Apache-2.0",
