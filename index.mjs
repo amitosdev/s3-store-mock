@@ -106,7 +106,6 @@ class S3StoreMock {
     if (!fileExists) {
       const error = new Error('The specified key does not exist.')
       error.name = 'NoSuchKey'
-      error.Code = 'NoSuchKey'
       throw error
     }
 
@@ -146,7 +145,7 @@ class S3StoreMock {
     } catch (err) {
       if (err.code === 'ENOENT') {
         const error = new Error('The specified key does not exist.')
-        error.Code = 'NoSuchKey'
+        error.name = 'NoSuchKey'
         throw error
       }
       throw err
