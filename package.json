@@ -1,0 +1,23 @@
+{
+  "name": "s3-store-mock",
+  "version": "0.0.1",
+  "description": "Mock implementation of @kessler/s3-store using local file system",
+  "author": "Amit Tal",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amitosdev/s3-store-mock.git"
+  },
+  "main": "index.mjs",
+  "scripts": {
+    "test": "ava"
+  },
+  "dependencies": {
+    "@kessler/s3-store": "^3.2.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.6",
+    "ava": "^6.4.1"
+  }
+}
