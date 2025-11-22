@@ -4,17 +4,17 @@ import path from 'node:path'
 
 const MOCK_DIR = '.s3StoreMock'
 
-export default function createS3Store(bucket, { mockDir = MOCK_DIR } = {}) {
-  return new S3StoreMock(bucket, { mockDir })
+export default function createS3Store(bucket, { mockDir = MOCK_DIR, basePath = process.cwd() } = {}) {
+  return new S3StoreMock(bucket, { mockDir, basePath })
 }
 
 class S3StoreMock {
   #bucket
   #basePath
 
-  constructor(bucket, { mockDir = MOCK_DIR } = {}) {
+  constructor(bucket, { mockDir = MOCK_DIR, basePath = process.cwd() } = {}) {
     this.#bucket = bucket
-    this.#basePath = path.join(process.cwd(), mockDir, bucket)
+    this.#basePath = path.join(basePath, mockDir, bucket)
   }
 
   async #ensureDir(filePath) {

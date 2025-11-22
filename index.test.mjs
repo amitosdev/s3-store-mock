@@ -135,6 +135,50 @@ test('createJsonWrapper, create and get if match', async (t) => {
   t.deepEqual(getResponse, body, 'body should match after getting object with JSON wrapper')
 })
 
+test('custom basePath - create and get', async (t) => {
+  const bucket = t.context.bucket
+  const customBasePath = path.join(process.cwd(), 'custom-base-path-test')
+  const store = createS3Store(bucket, { mockDir: MOCK_DIR, basePath: customBasePath })
+
+  const testObject = { test: 'custom base path' }
+  const key = 'test-object'
+  const contentType = 'application/json'
+
+  // Create object
+  const createResult = await store.createObject(key, JSON.stringify(testObject), contentType)
+  t.truthy(createResult.etag, 'etag should be returned')
+
+  // Verify file exists in custom base path
+  const expectedFilePath = path.join(customBasePath, MOCK_DIR, bucket, key)
+  const fileExists = await fs.access(expectedFilePath).then(() => true).catch(() => false)
+  t.true(fileExists, 'file should exist in custom base path')
+
+  // Get object
+  const getResult = await store.getObject(key)
+  const actualObject = await getResult.asJson()
+  t.deepEqual(actualObject, testObject, 'object should match')
+
+  // Cleanup custom base path
+  await fs.rm(customBasePath, { recursive: true, force: true })
+})
+
+test('default basePath uses process.cwd()', async (t) => {
+  const bucket = t.context.bucket
+  const store = createS3Store(bucket, { mockDir: MOCK_DIR })
+
+  const testObject = { test: 'default path' }
+  const key = 'test-object'
+  const contentType = 'application/json'
+
+  // Create object
+  await store.createObject(key, JSON.stringify(testObject), contentType)
+
+  // Verify file exists in default path (process.cwd())
+  const expectedFilePath = path.join(process.cwd(), MOCK_DIR, bucket, key)
+  const fileExists = await fs.access(expectedFilePath).then(() => true).catch(() => false)
+  t.true(fileExists, 'file should exist in default path (process.cwd())')
+})
+
 test.beforeEach(async (t) => {
   const bucket = `s3store-bucket-${randomString(10)}`
   t.context.bucket = bucket

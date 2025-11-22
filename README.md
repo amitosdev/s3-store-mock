@@ -23,8 +23,17 @@ import { createJsonWrapper } from '@kessler/s3-store'
 // Create a store (stores files in .s3StoreMock/my-bucket/ by default)
 const store = createS3Store('my-bucket')
 
-// Or specify a custom directory
+// Specify a custom directory name
 const store = createS3Store('my-bucket', { mockDir: './my-custom-mock-dir' })
+
+// Specify a custom base path (defaults to process.cwd())
+const store = createS3Store('my-bucket', { basePath: '/custom/path' })
+
+// Combine both options
+const store = createS3Store('my-bucket', {
+  mockDir: './my-custom-mock-dir',
+  basePath: '/custom/path'
+})
 
 // Use the JSON wrapper for automatic JSON serialization
 const jsonStore = createJsonWrapper(store)
@@ -66,9 +75,14 @@ This mock implements the same API as [@kessler/s3-store](https://github.com/kess
 npm test
 ```
 
+## Configuration Options
+
+- **`mockDir`** (default: `.s3StoreMock`) - The directory name where mock data is stored
+- **`basePath`** (default: `process.cwd()`) - The base path where the mockDir will be created
+
 ## How It Works
 
-- Files are stored in `.s3StoreMock/{bucket}/{key}` by default
+- Files are stored in `{basePath}/{mockDir}/{bucket}/{key}` (defaults to `.s3StoreMock/{bucket}/{key}` in current directory)
 - ETags are calculated using MD5 hashes
 - Metadata (ETags, content type) is stored in `.meta` files alongside the data files
 - All the same errors are thrown (`KeyExistsError`, `StaleDataError`, etc.)
