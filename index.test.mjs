@@ -179,6 +179,46 @@ test('default basePath uses process.cwd()', async (t) => {
   t.true(fileExists, 'file should exist in default path (process.cwd())')
 })
 
+test('list objects returns correct structure', async (t) => {
+  const bucket = t.context.bucket
+  const store = createS3Store(bucket, { mockDir: MOCK_DIR })
+
+  // Create multiple objects
+  await store.createObject('file1.json', JSON.stringify({ test: 1 }), 'application/json')
+  await store.createObject('file2.json', JSON.stringify({ test: 2 }), 'application/json')
+  await store.createObject('prefix/file3.json', JSON.stringify({ test: 3 }), 'application/json')
+
+  // List all objects
+  const allObjects = []
+  for await (const objects of store.list()) {
+    allObjects.push(...objects)
+  }
+
+  t.is(allObjects.length, 3, 'should list all 3 objects')
+
+  // Verify structure of each object
+  for (const obj of allObjects) {
+    t.truthy(obj.Key, 'should have Key property')
+    t.truthy(obj.LastModified, 'should have LastModified property')
+    t.truthy(obj.ETag, 'should have ETag property')
+    t.truthy(obj.Size, 'should have Size property')
+    t.is(obj.StorageClass, 'STANDARD', 'should have StorageClass set to STANDARD')
+    t.true(obj.ETag.startsWith('"') && obj.ETag.endsWith('"'), 'ETag should be wrapped in quotes')
+    t.truthy(obj.Owner, 'should have Owner property')
+    t.truthy(obj.Owner.DisplayName, 'should have Owner.DisplayName property')
+    t.truthy(obj.Owner.ID, 'should have Owner.ID property')
+  }
+
+  // List with prefix
+  const prefixObjects = []
+  for await (const objects of store.list('prefix/')) {
+    prefixObjects.push(...objects)
+  }
+
+  t.is(prefixObjects.length, 1, 'should list 1 object with prefix')
+  t.is(prefixObjects[0].Key, 'prefix/file3.json', 'should match the correct key')
+})
+
 test.beforeEach(async (t) => {
   const bucket = `s3store-bucket-${randomString(10)}`
   t.context.bucket = bucket

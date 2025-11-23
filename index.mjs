@@ -40,7 +40,11 @@ class S3StoreMock {
     try {
       await fs.access(filePath)
       return true
-    } catch {
+    } catch (err) {
+      // Only return false if file doesn't exist, throw other errors (permissions, etc.)
+      if (err.code !== 'ENOENT') {
+        throw err
+      }
       return false
     }
   }
@@ -50,7 +54,11 @@ class S3StoreMock {
     try {
       const metaContent = await fs.readFile(metaPath, 'utf8')
       return JSON.parse(metaContent)
-    } catch {
+    } catch (err) {
+      // Only ignore if meta file doesn't exist, throw other errors (JSON parse, permissions, etc.)
+      if (err.code !== 'ENOENT') {
+        throw err
+      }
       return null
     }
   }
@@ -127,7 +135,6 @@ class S3StoreMock {
 
       const response = {
         Body: {
-          content,
           transformToString: async () => content.toString('utf8'),
           transformToByteArray: async () => new Uint8Array(content),
           transformToWebStream: async () => {
@@ -207,8 +214,11 @@ class S3StoreMock {
 
         try {
           await fs.access(searchPath)
-        } catch {
-          // Path doesn't exist, return empty
+        } catch (err) {
+          // Only ignore if path doesn't exist, throw other errors (permissions, etc.)
+          if (err.code !== 'ENOENT') {
+            throw err
+          }
           return
         }
 
@@ -226,10 +236,30 @@ class S3StoreMock {
               const relativePath = path.relative(baseDir, fullPath)
               const stats = await fs.stat(fullPath)
 
+              // Read ETag from meta file
+              const metaPath = `${fullPath}.meta`
+              let etag = null
+              try {
+                const metaContent = await fs.readFile(metaPath, 'utf8')
+                const meta = JSON.parse(metaContent)
+                etag = meta.etag
+              } catch (err) {
+                // Only ignore if meta file doesn't exist, throw other errors
+                if (err.code !== 'ENOENT') {
+                  throw err
+                }
+              }
+
               results.push({
                 Key: relativePath.replace(/\\/g, '/'), // Normalize path separators
                 LastModified: stats.mtime,
-                Size: stats.size
+                ETag: etag,
+                Size: stats.size,
+                StorageClass: 'STANDARD',
+                Owner: {
+                  DisplayName: 'mock-owner',
+                  ID: 'mock-owner-id'
+                }
               })
             }
           }
