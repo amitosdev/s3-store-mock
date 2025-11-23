@@ -5,6 +5,8 @@
 export interface S3StoreOptions {
   /** Directory name for mock storage (default: '.s3StoreMock') */
   mockDir?: string
+  /** Base path where mockDir will be created (default: process.cwd()) */
+  basePath?: string
 }
 
 export interface ResponseWrapper {
@@ -30,8 +32,19 @@ export interface ListObjectResult {
   Key: string
   /** Last modified date of the object */
   LastModified: Date
+  /** Entity tag of the object (MD5 hash wrapped in quotes) */
+  ETag: string | null
   /** Size of the object in bytes */
   Size: number
+  /** Storage class of the object */
+  StorageClass: string
+  /** Owner information */
+  Owner: {
+    /** Display name of the owner */
+    DisplayName: string
+    /** ID of the owner */
+    ID: string
+  }
 }
 
 export interface S3StoreMock {

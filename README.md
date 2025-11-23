@@ -83,9 +83,11 @@ npm test
 ## How It Works
 
 - Files are stored in `{basePath}/{mockDir}/{bucket}/{key}` (defaults to `.s3StoreMock/{bucket}/{key}` in current directory)
-- ETags are calculated using MD5 hashes
+- ETags are calculated using MD5 hashes and wrapped in double quotes (e.g., `"6805f2cfc46c0f04559748bb039d69ae"`)
 - Metadata (ETags, content type) is stored in `.meta` files alongside the data files
 - All the same errors are thrown (`KeyExistsError`, `StaleDataError`, etc.)
+- List results match AWS S3 format with all properties: `Key`, `LastModified`, `ETag`, `Size`, `StorageClass`, and `Owner`
+- Error handling follows AWS SDK patterns - only expected errors (e.g., `ENOENT`) are caught, unexpected errors (permissions, corruption, etc.) are properly thrown
 
 ## Original Module
 
